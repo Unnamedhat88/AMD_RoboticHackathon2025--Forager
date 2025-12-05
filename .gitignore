@@ -74,8 +74,8 @@ ipython_config.py
 .python-version
 
 # Weights & Biases (wandb)
-wandb/
-*.wandb
+# wandb/
+# *.wandb
 
 # Model files and checkpoints
 *.pth
