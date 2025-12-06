@@ -1,7 +1,7 @@
-# AMD_Robotics_Hackathon_2025_[Project Name]
+# AMD_Robotics_Hackathon_2025_Forager
 <You coulde use the task you did in Mission2 as the project name, since Mission 1 is unified task for every team>
 
-**Title:** AMD_RoboticHackathon2025-[Your Work of Mission2]
+**Title:** AMD_RoboticHackathon2025-Forager
 
 **Team:** Mushroom Stew
 

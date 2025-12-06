@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, Animated } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Play, Square, Activity } from 'lucide-react-native';
+import { MotiView, MotiImage } from 'moti';
 
 const API_URL = 'http://10.0.2.2:8000'; // Android Emulator localhost
 // const API_URL = 'http://localhost:8000'; // iOS Simulator
@@ -11,22 +11,6 @@ const API_URL = 'http://10.0.2.2:8000'; // Android Emulator localhost
 export default function HomeScreen({ navigation }) {
     const [status, setStatus] = useState(null);
     const [loading, setLoading] = useState(true);
-    const scaleValue = useRef(new Animated.Value(1)).current;
-
-    const animateButton = () => {
-        Animated.sequence([
-            Animated.timing(scaleValue, {
-                toValue: 0.95,
-                duration: 100,
-                useNativeDriver: true,
-            }),
-            Animated.timing(scaleValue, {
-                toValue: 1,
-                duration: 100,
-                useNativeDriver: true,
-            }),
-        ]).start(() => navigation.navigate('Inventory'));
-    };
 
     const fetchStatus = async () => {
         try {
@@ -58,22 +42,51 @@ export default function HomeScreen({ navigation }) {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.contentContainer}>
-                <View style={styles.logoContainer}>
+                <MotiView
+                    style={styles.logoContainer}
+                    from={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{
+                        type: 'spring',
+                        duration: 1000,
+                        damping: 15,
+                    }}
+                >
                     <View style={styles.logoBackground}>
                         <Image source={require('../../assets/logo.png')} style={styles.logo} resizeMode="contain" />
                     </View>
-                </View>
-
+                </MotiView>
 
                 <View style={styles.controls}>
-                    <TouchableOpacity activeOpacity={0.8} onPress={animateButton}>
-                        <Animated.View style={[styles.button, styles.startButton, { transform: [{ scale: scaleValue }] }]}>
-                            {/* <Play color="#FFF" fill="#FFF" size={20} /> */}
-                            <Text style={styles.buttonText}>Inventory</Text>
-                        </Animated.View>
-                    </TouchableOpacity>
-
-
+                    <MotiView
+                        from={{ opacity: 0, translateY: 50 }}
+                        animate={{ opacity: 1, translateY: 0 }}
+                        transition={{
+                            type: 'timing',
+                            duration: 500,
+                            delay: 500,
+                        }}
+                    >
+                        <TouchableOpacity
+                            activeOpacity={0.8}
+                            onPress={() => navigation.navigate('Inventory')}
+                        >
+                            <MotiView
+                                style={[styles.button, styles.startButton]}
+                                from={{ scale: 1 }}
+                                animate={({ pressed }) => ({
+                                    scale: pressed ? 0.95 : 1,
+                                })}
+                                transition={{
+                                    type: 'spring',
+                                    damping: 10,
+                                    stiffness: 200,
+                                }}
+                            >
+                                <Text style={styles.buttonText}>Inventory</Text>
+                            </MotiView>
+                        </TouchableOpacity>
+                    </MotiView>
                 </View>
             </View>
         </SafeAreaView>
