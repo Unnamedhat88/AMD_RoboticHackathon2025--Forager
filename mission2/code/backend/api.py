@@ -36,6 +36,25 @@ def create_app(planner, inventory):
 
     @app.get("/inventory")
     def get_inventory():
-        return inventory.get_inventory()
+        # Use the new DB logic directly
+        from logic import inventory_db
+        return inventory_db.get_all_items()
+
+    @app.post("/inventory/add")
+    def add_inventory_item(item: dict):
+        from logic import inventory_db
+        return inventory_db.add_item(item['item_name'], item['category'], item.get('qty', 1))
+
+    @app.delete("/inventory/delete")
+    def delete_inventory_item(item_name: str):
+        from logic import inventory_db
+        success = inventory_db.delete_item(item_name)
+        return {"success": success}
+
+    @app.post("/inventory/clear")
+    def clear_inventory():
+        from logic import inventory_db
+        inventory_db.clear_db()
+        return {"message": "Inventory cleared"}
 
     return app

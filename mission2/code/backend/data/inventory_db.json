@@ -1,0 +1,16 @@
+[
+    {
+        "id": 1,
+        "item_name": "Apple",
+        "category": "Fruit",
+        "qty": 3,
+        "timestamp": "08:36 PM"
+    },
+    {
+        "id": 2,
+        "item_name": "Banana",
+        "category": "Fruit",
+        "qty": 5,
+        "timestamp": "08:36 PM"
+    }
+]

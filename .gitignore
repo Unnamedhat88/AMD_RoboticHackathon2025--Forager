@@ -87,7 +87,6 @@ runs/
 outputs/
 
 # Data files (common patterns)
-*.csv
 # *.json
 *.pkl
 *.pickle
@@ -95,8 +94,6 @@ outputs/
 *.hdf5
 *.npy
 *.npz
-data/
-datasets/
 *.zip
 *.tar
 *.tar.gz
