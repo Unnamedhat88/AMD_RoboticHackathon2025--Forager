@@ -1,92 +1,82 @@
 import torch
-from transformers import pipeline
-from PIL import Image
+from ultralytics import YOLO
 import numpy as np
 
 class GroceryDetector:
-    def __init__(self, model_id="IDEA-Research/grounding-dino-tiny", device=None):
+    def __init__(self, model_path="yolov8n.pt", device=None):
         if device is None:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
         else:
             self.device = device
             
-        print(f"Loading GroundingDINO model ({model_id}) on {self.device}...")
+        print(f"Loading YOLOv8 model ({model_path}) on {self.device}...")
         try:
-            # Use zero-shot-object-detection pipeline
-            self.detector = pipeline("zero-shot-object-detection", model=model_id, device=self.device)
+            self.model = YOLO(model_path)
+            # Warmup
+            # self.model(np.zeros((640, 640, 3), dtype=np.uint8)) 
             print("Model loaded successfully.")
         except Exception as e:
             print(f"Error loading model: {e}")
-            self.detector = None
-
-    def detect_objects(self, image, text_prompts):
-        """
-        Detects objects in an image based on text prompts.
-        
-        Args:
-            image: numpy array (H, W, 3) or PIL Image.
-            text_prompts: List of strings (e.g. ["apple", "banana"])
-        
-        Returns:
-            list of dicts: [{'score': float, 'label': str, 'box': [xmin, ymin, xmax, ymax]}]
-        """
-        if self.detector is None:
-            print("Detector not initialized.")
-            return []
-
-        if isinstance(image, np.ndarray):
-            image = Image.fromarray(image)
-        
-        # zero-shot-object-detection pipeline expects 'candidate_labels' as a list of strings
-        if isinstance(text_prompts, str):
-            text_prompts = [text_prompts]
-
-        # Run detection
-        # The pipeline returns a list of dicts: {'score': float, 'label': str, 'box': {'xmin': int, 'ymin': int, 'xmax': int, 'ymax': int}}
-        try:
-            results = self.detector(image, candidate_labels=text_prompts)
-        except Exception as e:
-            print(f"Error during detection: {e}")
-            return []
-        
-        # Format results
-        formatted_results = []
-        for r in results:
-            box = r['box']
-            # Ensure box is in [xmin, ymin, xmax, ymax] list format
-            fmt_box = [box['xmin'], box['ymin'], box['xmax'], box['ymax']]
-            formatted_results.append({
-                'score': r['score'],
-                'label': r['label'],
-                'box': fmt_box
-            })
-            
-        return formatted_results
+            self.model = None
 
     def detect_item(self, image):
         """
-        Mock detection for Phase 1.A.
-        Returns a random item from the grocery list.
+        Detects the most prominent item in the image for /scan endpoint.
+        Returns mapped label and confidence.
         """
-        import random
-        GROCERY_CLASSES = ["apple", "banana", "bread", "milk", "egg"]
+        if self.model is None:
+            return {"name": "Unknown (Model Failed)", "confidence": 0.0}
+
+        # Run inference
+        results = self.model(image, verbose=False)
         
-        # Simulate processing time
-        # import time
-        # time.sleep(0.5)
+        # Process results
+        # We want the highest confidence object
+        best_box = None
+        best_conf = -1.0
+        best_class_id = -1
         
-        item = random.choice(GROCERY_CLASSES)
-        confidence = random.uniform(0.8, 0.99)
+        for r in results:
+            boxes = r.boxes
+            for box in boxes:
+                conf = float(box.conf)
+                if conf > best_conf:
+                    best_conf = conf
+                    best_box = box.xyxy[0].tolist() # [xmin, ymin, xmax, ymax]
+                    best_class_id = int(box.cls)
+        
+        if best_conf < 0.3: # Threshold
+             return {"name": "Unknown Item", "confidence": 0.0}
+             
+        # Get label map
+        raw_label = self.model.names[best_class_id]
+        clean_label = self._map_label(raw_label)
         
         return {
-            "label": item,
-            "score": confidence,
-            "box": [100, 100, 200, 200] # Dummy box
+            "name": clean_label,
+            "confidence": best_conf,
+            "box": best_box # Optional: might be useful later
         }
 
+    def _map_label(self, label):
+        """
+        Map YOLOv8 COCO labels to Grocery labels.
+        COCO classes relevant: 'banana', 'apple', 'orange', 'broccoli', 'carrot', 'bottle', 'cup' ...
+        """
+        mapping = {
+            "banana": "Banana",
+            "apple": "Red Apple",
+            "orange": "Orange",
+            "broccoli": "Broccoli",
+            "carrot": "Carrot",
+            "bottle": "Milk", # Assuming bottle -> Milk for now based on prompt
+            "cup": "Cereal", # Weird mapping but placeholders
+            "box": "Cereal", # Not in COCO usually, but maybe YOLO defines it?
+        }
+        return mapping.get(label, label.title())
+
 if __name__ == "__main__":
-    # Test block
     det = GroceryDetector()
-    img = Image.new('RGB', (640, 480), color='white')
-    res = det.detect_objects(img, ["apple", "banana"])
-    print(res)
+    # Mock image test
+    img = np.zeros((480, 640, 3), dtype=np.uint8)
+    print(det.detect_item(img))

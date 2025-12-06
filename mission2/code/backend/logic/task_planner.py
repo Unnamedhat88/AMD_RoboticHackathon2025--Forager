@@ -126,26 +126,32 @@ class TaskPlanner:
         result = self.detector.detect_item(frame)
         
         # 3. Log
-        item_label = result['label']
-        self.logger.info(f"Detected: {item_label} (Score: {result['score']:.2f})")
+        # New detector returns "name" and "confidence"
+        item_label = result.get('name', "Unknown")
+        confidence = result.get('confidence', 0.0)
+        
+        self.logger.info(f"Detected: {item_label} (Score: {confidence:.2f})")
         
         # Use the inventory manager to log (it wraps the DB logic)
-        db_item = self.inventory.log_item(item_label, category="grocery", status="manual_scan")
+        if item_label != "Unknown Item":
+             db_item = self.inventory.log_item(item_label, category="grocery", status="manual_scan")
+        else:
+             db_item = None
         
         # 4. Return formatted result
         if db_item:
             return {
                 "name": db_item['name'],
                 "quantity": db_item['qty'],
-                "confidence": result['score']
+                "confidence": confidence
             }
         else:
-            # Fallback if DB log failed
+            # Fallback if DB log failed or unknown item
             return {
                 "name": item_label,
-                "quantity": 1, # Assumption
-                "confidence": result['score'],
-                "error": "Failed to log to DB"
+                "quantity": 0 if item_label == "Unknown Item" else 1, 
+                "confidence": confidence,
+                "error": "Not logged" if item_label == "Unknown Item" else "Failed to log to DB"
             }
 
     def stop(self):

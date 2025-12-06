@@ -11,8 +11,8 @@ def main():
     
     # Initialize components
     # Initialize components
-    # Phase 1.A: Force mock camera
-    camera = CameraInterface(mock=True)
+    # Phase 1.A: Force mock camera -> Phase 2.B: Real Camera
+    camera = CameraInterface(mock=False)
     arm = ArmController(mock=True)
     
     # Initialize Perception & Manipulation & Logic

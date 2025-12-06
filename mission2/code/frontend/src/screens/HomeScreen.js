@@ -6,7 +6,7 @@ import { MotiView, MotiImage } from 'moti';
 
 // const API_URL = 'http://10.0.2.2:8000'; // Android Emulator localhost
 // const API_URL = 'http://localhost:8000'; // iOS Simulator
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.11.33:8000'; // Fallback to physical device IP
+const API_URL = process.env.EXPO_PUBLIC_API_URL; // Configured in .env
 
 import ScanningModal from '../components/ScanningModal';
 
