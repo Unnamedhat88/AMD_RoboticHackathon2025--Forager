@@ -16,57 +16,30 @@ def main():
     camera = CameraInterface(mock=True)
     arm = ArmController(mock=True)
     
-    # Initialize Perception & Manipulation
+    # Initialize Perception & Manipulation & Logic
     try:
         from perception.detector import GroceryDetector
         from perception.segmenter import GrocerySegmenter
         from manipulation.grasp_planner import GraspPlanner
+        from logic.task_planner import TaskPlanner
+        from logic.inventory import InventoryManager
         
         detector = GroceryDetector()
         segmenter = GrocerySegmenter()
         grasp_planner = GraspPlanner()
+        inventory = InventoryManager()
+        
+        # Initialize Planner
+        planner = TaskPlanner(camera, arm, detector, segmenter, grasp_planner, inventory)
+        
     except Exception as e:
         logger.error(f"Failed to initialize modules: {e}")
         return
 
     try:
-        # Simple test loop
-        for i in range(3):
-            logger.info(f"--- Cycle {i+1} ---")
-            
-            # Perception step
-            frame = camera.get_frame()
-            logger.info(f"Captured frame with shape {frame.shape}")
-            
-            # Detect objects
-            prompts = ["grocery item", "bottle", "fruit"]
-            detections = detector.detect_objects(frame, prompts)
-            logger.info(f"Detected {len(detections)} objects: {[d['label'] for d in detections]}")
-            
-            # Segment & Plan Grasp
-            if detections:
-                boxes = [d['box'] for d in detections]
-                masks = segmenter.segment_objects(frame, boxes)
-                logger.info(f"Generated {len(masks)} masks")
-                
-                # Pick the first object
-                target_pose = grasp_planner.plan_grasp_from_mask(masks[0])
-                if target_pose:
-                     logger.info(f"Planned grasp pose: {target_pose}")
-                     
-                     # Manipulation step
-                     arm.move_to_pose(target_pose)
-                     arm.close_gripper()
-                     time.sleep(0.5)
-                     # Lift up (Z + 0.2)
-                     lift_pose = list(target_pose)
-                     lift_pose[2] += 0.2
-                     arm.move_to_pose(lift_pose) 
-                     arm.open_gripper()
-            else:
-                logger.info("No objects detected, skipping manipulation.")
-            
-            time.sleep(1)
+        # Run state machine
+        logger.info("Starting Task Planner Loop...")
+        planner.run(cycles=10)
 
     except KeyboardInterrupt:
         logger.info("Stopping system...")
