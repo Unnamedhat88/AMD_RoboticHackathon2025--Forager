@@ -1,16 +1,16 @@
 [
     {
         "id": 1,
-        "item_name": "Apple",
-        "category": "Fruit",
-        "qty": 4,
-        "timestamp": "08:44 PM"
+        "name": "apple",
+        "category": "grocery",
+        "qty": 1,
+        "timestamp": "06/12/25 09:20 PM"
     },
     {
         "id": 2,
-        "item_name": "Banana",
-        "category": "Fruit",
-        "qty": 5,
-        "timestamp": "08:36 PM"
+        "name": "bread",
+        "category": "grocery",
+        "qty": 2,
+        "timestamp": "06/12/25 09:22 PM"
     }
 ]

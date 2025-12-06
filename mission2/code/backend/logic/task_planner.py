@@ -130,10 +130,23 @@ class TaskPlanner:
         self.logger.info(f"Detected: {item_label} (Score: {result['score']:.2f})")
         
         # Use the inventory manager to log (it wraps the DB logic)
-        # We pass 'manual_scan' as status just for info, though DB might ignore it
-        self.inventory.log_item(item_label, category="grocery", status="manual_scan")
+        db_item = self.inventory.log_item(item_label, category="grocery", status="manual_scan")
         
-        return result
+        # 4. Return formatted result
+        if db_item:
+            return {
+                "name": db_item['name'],
+                "quantity": db_item['qty'],
+                "confidence": result['score']
+            }
+        else:
+            # Fallback if DB log failed
+            return {
+                "name": item_label,
+                "quantity": 1, # Assumption
+                "confidence": result['score'],
+                "error": "Failed to log to DB"
+            }
 
     def stop(self):
         self.running = False

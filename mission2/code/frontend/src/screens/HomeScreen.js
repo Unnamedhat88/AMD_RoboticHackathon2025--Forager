@@ -4,13 +4,16 @@ import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MotiView, MotiImage } from 'moti';
 
-const API_URL = 'http://10.0.2.2:8000'; // Android Emulator localhost
+// const API_URL = 'http://10.0.2.2:8000'; // Android Emulator localhost
 // const API_URL = 'http://localhost:8000'; // iOS Simulator
-// const API_URL = 'http://<YOUR_LAN_IP>:8000'; // Physical Device
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.11.33:8000'; // Fallback to physical device IP
+
+import ScanningModal from '../components/ScanningModal';
 
 export default function HomeScreen({ navigation }) {
     const [status, setStatus] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [scanning, setScanning] = useState(false);
 
     const fetchStatus = async () => {
         try {
@@ -24,13 +27,22 @@ export default function HomeScreen({ navigation }) {
     };
 
     const handleScan = async () => {
+        setScanning(true);
         try {
-            const response = await axios.post(`${API_URL}/scan`);
+            // Add 10s timeout to prevent infinite hanging
+            const response = await axios.post(`${API_URL}/scan`, {}, { timeout: 10000 });
             const result = response.data.result;
-            Alert.alert('Item Detected', `Found: ${result.label} (Confidence: ${(result.score * 100).toFixed(1)}%)`, [
-                { text: 'OK', onPress: () => navigation.navigate('Inventory') }
-            ]);
+
+            // Wait a bit to show the animation (optional, but nice for UX)
+            setTimeout(() => {
+                setScanning(false);
+                Alert.alert('Item Scanned', `Successfully logged: ${result.name}\nConfidence: ${(result.confidence * 100).toFixed(1)}%\nQty: ${result.quantity}`, [
+                    { text: 'View Inventory', onPress: () => navigation.navigate('Inventory') }
+                ]);
+            }, 1500);
+
         } catch (error) {
+            setScanning(false);
             Alert.alert('Error', 'Failed to scan item');
             console.log(error);
         }
@@ -38,6 +50,7 @@ export default function HomeScreen({ navigation }) {
 
     return (
         <SafeAreaView style={styles.container}>
+            <ScanningModal visible={scanning} />
             <View style={styles.contentContainer}>
                 <MotiView
                     style={styles.logoContainer}

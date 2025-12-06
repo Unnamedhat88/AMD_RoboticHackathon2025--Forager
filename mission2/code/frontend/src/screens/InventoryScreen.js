@@ -5,8 +5,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Package, Clock, Tag, ArrowLeft } from 'lucide-react-native';
 import { MotiView } from 'moti';
 
-const API_URL = 'http://10.0.2.2:8000'; // Android Emulator
+// const API_URL = 'http://10.0.2.2:8000'; // Android Emulator
 // const API_URL = 'http://localhost:8000'; // iOS
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.11.33:8000'; // Fallback to physical device IP
 
 export default function InventoryScreen({ navigation }) {
     const [items, setItems] = useState([]);
@@ -14,11 +15,11 @@ export default function InventoryScreen({ navigation }) {
     const [loading, setLoading] = useState(true);
 
     const FAKE_DATA = [
-        { item_name: 'Red Apple', qty: 1, timestamp: '10:30 AM' },
-        { item_name: 'Banana', qty: 5, timestamp: '10:32 AM' },
-        { item_name: 'Carrot', qty: 2, timestamp: '10:35 AM' },
-        { item_name: 'Milk', qty: 12, timestamp: '10:40 AM' },
-        { item_name: 'Cereal', qty: 7, timestamp: '10:45 AM' },
+        { name: 'Red Apple', qty: 1, timestamp: '06/12/25 10:30 AM' },
+        { name: 'Banana', qty: 5, timestamp: '06/12/25 10:32 AM' },
+        { name: 'Carrot', qty: 2, timestamp: '06/12/25 10:35 AM' },
+        { name: 'Milk', qty: 12, timestamp: '06/12/25 10:40 AM' },
+        { name: 'Cereal', qty: 7, timestamp: '06/12/25 10:45 AM' },
     ];
 
     const fetchInventory = async () => {
@@ -64,7 +65,7 @@ export default function InventoryScreen({ navigation }) {
                 <Package color="#6B4E3D" size={24} />
             </View>
             <View style={styles.itemDetails}>
-                <Text style={styles.itemName}>{item.item_name}</Text>
+                <Text style={styles.itemName}>{item.name}</Text>
                 <View style={styles.metaRow}>
                     <Tag color="#8FBC8F" size={14} />
                     <Text style={styles.qty}>Qty: {item.qty}</Text>

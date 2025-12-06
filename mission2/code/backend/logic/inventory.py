@@ -11,10 +11,12 @@ class InventoryManager:
         # Note: 'status' is not currently used in the simple JSON schema, 
         # but we could add it if needed. For now, we just track name, category, qty.
         try:
-            inventory_db.add_item(item_name, category)
+            result = inventory_db.add_item(item_name, category)
             self.logger.info(f"Logged item: {item_name} ({category})")
+            return result
         except Exception as e:
             self.logger.error(f"Failed to log item: {e}")
+            return None
 
     def get_inventory(self):
         try:
