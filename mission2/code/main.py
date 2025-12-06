@@ -23,6 +23,9 @@ def main():
         from manipulation.grasp_planner import GraspPlanner
         from logic.task_planner import TaskPlanner
         from logic.inventory import InventoryManager
+        from ui.api import create_app
+        import threading
+        import uvicorn
         
         detector = GroceryDetector()
         segmenter = GrocerySegmenter()
@@ -37,9 +40,15 @@ def main():
         return
 
     try:
-        # Run state machine
-        logger.info("Starting Task Planner Loop...")
-        planner.run(cycles=10)
+        # Start Planner Thread
+        planner_thread = threading.Thread(target=planner.run_loop, daemon=True)
+        planner_thread.start()
+        logger.info("Planner thread started.")
+        
+        # Start API Server
+        logger.info("Starting API Server on port 8000...")
+        app = create_app(planner, inventory)
+        uvicorn.run(app, host="0.0.0.0", port=8000)
 
     except KeyboardInterrupt:
         logger.info("Stopping system...")

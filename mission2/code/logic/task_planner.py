@@ -14,9 +14,8 @@ class TaskPlanner:
         self.camera = camera
         self.arm = arm
         self.detector = detector
-        self.segmenter = segmenter
-        self.grasp_planner = grasp_planner
         self.inventory = inventory
+        self.running = False
         
         self.state = State.IDLE
         self.logger = logging.getLogger("TaskPlanner")
@@ -28,8 +27,12 @@ class TaskPlanner:
         Main state machine loop step.
         """
         if self.state == State.IDLE:
-            self.logger.info("State: IDLE -> PERCEIVE")
-            self.state = State.PERCEIVE
+            # Only transition if running, otherwise just stay idle
+            if self.running:
+                self.logger.info("State: IDLE -> PERCEIVE")
+                self.state = State.PERCEIVE
+            else:
+                time.sleep(0.1)
             
         elif self.state == State.PERCEIVE:
             self.logger.info("State: PERCEIVE")
@@ -104,10 +107,31 @@ class TaskPlanner:
             self.state = State.IDLE
             time.sleep(1)
             
-    def run(self, cycles=5):
-        for _ in range(cycles):
+    def start(self):
+        self.running = True
+        self.logger.info("TaskPlanner started.")
+
+    def stop(self):
+        self.running = False
+        self.logger.info("TaskPlanner stopped.")
+
+    def get_status(self):
+        return {
+            "state": self.state.name,
+            "running": self.running,
+            "current_item": self.current_item_label
+        }
+
+    def run_loop(self):
+        self.logger.info("TaskPlanner loop running...")
+        while True:
+            # We can use a separate flag for the thread loop vs the logic 'running'
+            # But for simplicity, let's just loop forever and check self.running inside update_state
+            # or break if we want to kill the thread.
+            # Let's assume the thread runs forever but only does work if self.running is True.
             try:
                 self.update_state()
             except Exception as e:
                 self.logger.error(f"Error in state machine: {e}")
-                break
+                time.sleep(1)
+            time.sleep(0.1)
