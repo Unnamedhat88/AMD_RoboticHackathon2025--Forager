@@ -16,14 +16,17 @@ def main():
     camera = CameraInterface(mock=True)
     arm = ArmController(mock=True)
     
-    # Initialize Perception
+    # Initialize Perception & Manipulation
     try:
         from perception.detector import GroceryDetector
         from perception.segmenter import GrocerySegmenter
+        from manipulation.grasp_planner import GraspPlanner
+        
         detector = GroceryDetector()
         segmenter = GrocerySegmenter()
+        grasp_planner = GraspPlanner()
     except Exception as e:
-        logger.error(f"Failed to initialize perception: {e}")
+        logger.error(f"Failed to initialize modules: {e}")
         return
 
     try:
@@ -40,22 +43,28 @@ def main():
             detections = detector.detect_objects(frame, prompts)
             logger.info(f"Detected {len(detections)} objects: {[d['label'] for d in detections]}")
             
-            # Segment objects
+            # Segment & Plan Grasp
             if detections:
                 boxes = [d['box'] for d in detections]
                 masks = segmenter.segment_objects(frame, boxes)
                 logger.info(f"Generated {len(masks)} masks")
-            
-            # Planning step (Simulated)
-            target_pose = [0.5, 0.2, 0.3, 0, 3.14, 0]
-            logger.info(f"Planned target pose: {target_pose}")
-            
-            # Manipulation step
-            arm.move_to_pose(target_pose)
-            arm.close_gripper()
-            time.sleep(0.5)
-            arm.move_to_pose([0.5, 0.2, 0.5, 0, 3.14, 0]) # Lift
-            arm.open_gripper()
+                
+                # Pick the first object
+                target_pose = grasp_planner.plan_grasp_from_mask(masks[0])
+                if target_pose:
+                     logger.info(f"Planned grasp pose: {target_pose}")
+                     
+                     # Manipulation step
+                     arm.move_to_pose(target_pose)
+                     arm.close_gripper()
+                     time.sleep(0.5)
+                     # Lift up (Z + 0.2)
+                     lift_pose = list(target_pose)
+                     lift_pose[2] += 0.2
+                     arm.move_to_pose(lift_pose) 
+                     arm.open_gripper()
+            else:
+                logger.info("No objects detected, skipping manipulation.")
             
             time.sleep(1)
 
