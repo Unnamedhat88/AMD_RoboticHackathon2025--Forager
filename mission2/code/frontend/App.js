@@ -14,11 +14,20 @@ export default function App() {
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: '#1E1E2E',
-            borderTopColor: '#2E3440',
+            display: 'none', // Hide the nav bar
+            backgroundColor: '#F9F8F2', // COLORS.background
+            borderTopColor: '#E0E0E0', // COLORS.border
+            elevation: 0, // Remove shadow on Android for cleaner look
+            shadowOpacity: 0, // Remove shadow on iOS
+            height: 60,
+            paddingBottom: 10,
           },
-          tabBarActiveTintColor: '#88C0D0',
-          tabBarInactiveTintColor: '#4C566A',
+          tabBarActiveTintColor: '#6B8E23', // COLORS.primary
+          tabBarInactiveTintColor: '#A0A0A0', // COLORS.inactive
+          tabBarLabelStyle: {
+            fontFamily: 'System', // FONTS.body
+            fontSize: 12,
+          },
         }}
       >
         <Tab.Screen

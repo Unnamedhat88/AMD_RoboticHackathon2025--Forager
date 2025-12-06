@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, Animated } from 'react-native';
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Play, Square, Activity } from 'lucide-react-native';
@@ -8,9 +8,25 @@ const API_URL = 'http://10.0.2.2:8000'; // Android Emulator localhost
 // const API_URL = 'http://localhost:8000'; // iOS Simulator
 // const API_URL = 'http://<YOUR_LAN_IP>:8000'; // Physical Device
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
     const [status, setStatus] = useState(null);
     const [loading, setLoading] = useState(true);
+    const scaleValue = useRef(new Animated.Value(1)).current;
+
+    const animateButton = () => {
+        Animated.sequence([
+            Animated.timing(scaleValue, {
+                toValue: 0.95,
+                duration: 100,
+                useNativeDriver: true,
+            }),
+            Animated.timing(scaleValue, {
+                toValue: 1,
+                duration: 100,
+                useNativeDriver: true,
+            }),
+        ]).start(() => navigation.navigate('Inventory'));
+    };
 
     const fetchStatus = async () => {
         try {
@@ -41,45 +57,24 @@ export default function HomeScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>GroceryBot</Text>
-                <Activity color="#A3BE8C" size={24} />
-            </View>
-
-            <View style={styles.statusCard}>
-                <Text style={styles.cardTitle}>System Status</Text>
-                {status ? (
-                    <View style={styles.statusInfo}>
-                        <View style={styles.row}>
-                            <Text style={styles.label}>State:</Text>
-                            <Text style={styles.value}>{status.state}</Text>
-                        </View>
-                        <View style={styles.row}>
-                            <Text style={styles.label}>Running:</Text>
-                            <Text style={[styles.value, { color: status.running ? '#A3BE8C' : '#BF616A' }]}>
-                                {status.running ? 'Active' : 'Stopped'}
-                            </Text>
-                        </View>
-                        <View style={styles.row}>
-                            <Text style={styles.label}>Current Item:</Text>
-                            <Text style={styles.value}>{status.current_item || 'None'}</Text>
-                        </View>
+            <View style={styles.contentContainer}>
+                <View style={styles.logoContainer}>
+                    <View style={styles.logoBackground}>
+                        <Image source={require('../../assets/logo.png')} style={styles.logo} resizeMode="contain" />
                     </View>
-                ) : (
-                    <Text style={styles.offlineText}>Connecting to robot...</Text>
-                )}
-            </View>
+                </View>
 
-            <View style={styles.controls}>
-                <TouchableOpacity style={[styles.button, styles.startButton]} onPress={() => sendCommand('start')}>
-                    <Play color="#FFF" fill="#FFF" />
-                    <Text style={styles.buttonText}>Start</Text>
-                </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.button, styles.stopButton]} onPress={() => sendCommand('stop')}>
-                    <Square color="#FFF" fill="#FFF" />
-                    <Text style={styles.buttonText}>Stop</Text>
-                </TouchableOpacity>
+                <View style={styles.controls}>
+                    <TouchableOpacity activeOpacity={0.8} onPress={animateButton}>
+                        <Animated.View style={[styles.button, styles.startButton, { transform: [{ scale: scaleValue }] }]}>
+                            {/* <Play color="#FFF" fill="#FFF" size={20} /> */}
+                            <Text style={styles.buttonText}>Inventory</Text>
+                        </Animated.View>
+                    </TouchableOpacity>
+
+
+                </View>
             </View>
         </SafeAreaView>
     );
@@ -88,34 +83,48 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1E1E2E', // Dark background
-        padding: 20,
+        backgroundColor: '#F9F8F2', // COLORS.background
     },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+    contentContainer: {
+        flex: 1,
+        padding: 50,
+        paddingTop: 0,
+        paddingBottom: 200, // Push content up
         alignItems: 'center',
-        marginBottom: 30,
+        justifyContent: 'center',
     },
-    headerTitle: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#D8DEE9',
+    logoContainer: {
+        marginBottom: -50,
+        alignItems: 'center',
+        width: '100%',
     },
+    logoBackground: {
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    logo: {
+        width: 600,
+        height: 600,
+    },
+    // headerTextContainer removed
     statusCard: {
-        backgroundColor: '#2E3440',
-        borderRadius: 16,
+        width: '100%',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 20,
         padding: 20,
         marginBottom: 30,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4.65,
-        elevation: 8,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+        elevation: 3,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
     },
     cardTitle: {
         fontSize: 18,
-        color: '#88C0D0',
+        color: '#6B8E23', // COLORS.primary
         marginBottom: 15,
         fontWeight: '600',
     },
@@ -127,39 +136,47 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     label: {
-        color: '#D8DEE9',
+        color: '#6B4E3D', // COLORS.text
         fontSize: 16,
+        opacity: 0.8,
     },
     value: {
-        color: '#ECEFF4',
+        color: '#6B4E3D', // COLORS.text
         fontSize: 16,
         fontWeight: 'bold',
     },
     offlineText: {
         color: '#BF616A',
         fontStyle: 'italic',
+        textAlign: 'center',
     },
     controls: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
+        width: '100%',
+        gap: 15,
     },
     button: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 15,
-        paddingHorizontal: 30,
-        borderRadius: 12,
+        justifyContent: 'center',
+        paddingVertical: 18,
+        borderRadius: 30, // Pill shape
         gap: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 5,
     },
     startButton: {
-        backgroundColor: '#A3BE8C',
+        backgroundColor: '#6B8E23', // COLORS.primary
     },
     stopButton: {
-        backgroundColor: '#BF616A',
+        backgroundColor: '#BF616A', // Keep red for stop, but maybe softer?
+        opacity: 0.9,
     },
     buttonText: {
         color: '#FFF',
-        fontSize: 18,
-        fontWeight: 'bold',
+        fontSize: 22,
+        fontWeight: '600',
     },
 });
