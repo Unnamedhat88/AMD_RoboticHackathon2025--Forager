@@ -23,7 +23,7 @@ def main():
         from manipulation.grasp_planner import GraspPlanner
         from logic.task_planner import TaskPlanner
         from logic.inventory import InventoryManager
-        from ui.api import create_app
+        from api import create_app
         import threading
         import uvicorn
         
