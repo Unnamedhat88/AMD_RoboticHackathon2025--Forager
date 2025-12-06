@@ -8,3 +8,7 @@ matplotlib
 requests
 Pillow
 scipy
+ultralytics
+opencv-python-headless
+torchvision
+lapx

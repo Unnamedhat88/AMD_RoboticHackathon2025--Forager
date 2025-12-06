@@ -1,59 +1,55 @@
 import time
 import logging
-from perception.camera import CameraInterface
+import threading
+import uvicorn
+from api import create_app
+
+# New imports
+from perception.camera_stream import CameraStream
+from perception.tracker_state import TrackerState
+from perception.continuous_detector import PerceptionLoop
+from logic.inventory import InventoryManager
+
+# Keep ArmController for now, though not heavily used yet
 from manipulation.arm_controller import ArmController
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Main")
 
 def main():
-    logger.info("Starting Grocery Sorting Robot System...")
+    logger.info("Starting Grocery Sorting Robot System (Phase 2.C)...")
     
-    # Initialize components
-    camera = CameraInterface(mock=False) # Try real camera, fallback to mock if fails? Handled in class.
-    # Actually, CameraInterface default was mock=True. Let's stick to mock for now unless we are sure.
-    # The plan said "Implement camera interface (Real/Mock)". Let's leave it as is but initialize detector.
-    camera = CameraInterface(mock=True)
-    arm = ArmController(mock=True)
+    # 1. Initialize Threaded Camera
+    camera = CameraStream(src=0).start()
+    time.sleep(1.0) # Warmup
     
-    # Initialize Perception & Manipulation & Logic
+    # 2. Initialize Tracker State
+    tracker_state = TrackerState()
+    
+    # 3. Initialize Perception Loop
+    detector = PerceptionLoop(camera, tracker_state)
+    detector.start()
+    
+    # 4. Initialize Other Components
+    inventory = InventoryManager()
+    arm = ArmController(mock=True) # Phase 1 artifact
+    
+    # Note: TaskPlanner is temporarily bypassed/deprecated in Phase 2.C 
+    # as we move to a continuous decoupled architecture.
+    # Logic will move to consuming tracker_state.
+    
     try:
-        from perception.detector import GroceryDetector
-        from perception.segmenter import GrocerySegmenter
-        from manipulation.grasp_planner import GraspPlanner
-        from logic.task_planner import TaskPlanner
-        from logic.inventory import InventoryManager
-        from api import create_app
-        import threading
-        import uvicorn
-        
-        detector = GroceryDetector()
-        segmenter = GrocerySegmenter()
-        grasp_planner = GraspPlanner()
-        inventory = InventoryManager()
-        
-        # Initialize Planner
-        planner = TaskPlanner(camera, arm, detector, segmenter, grasp_planner, inventory)
-        
-    except Exception as e:
-        logger.error(f"Failed to initialize modules: {e}")
-        return
-
-    try:
-        # Start Planner Thread
-        planner_thread = threading.Thread(target=planner.run_loop, daemon=True)
-        planner_thread.start()
-        logger.info("Planner thread started.")
-        
         # Start API Server
         logger.info("Starting API Server on port 8000...")
-        app = create_app(planner, inventory)
+        # We pass tracker_state to the API instead of planner
+        app = create_app(tracker_state, inventory, arm)
         uvicorn.run(app, host="0.0.0.0", port=8000)
 
     except KeyboardInterrupt:
         logger.info("Stopping system...")
     finally:
-        camera.release()
+        detector.stop()
+        camera.stop()
         logger.info("System shutdown.")
 
 if __name__ == "__main__":

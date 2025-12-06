@@ -1,0 +1,16 @@
+[
+    {
+        "id": 2,
+        "name": "bread",
+        "category": "grocery",
+        "qty": 2,
+        "timestamp": "06/12/25 09:22 PM"
+    },
+    {
+        "id": 3,
+        "name": "milk",
+        "category": "grocery",
+        "qty": 1,
+        "timestamp": "06/12/25 09:24 PM"
+    }
+]

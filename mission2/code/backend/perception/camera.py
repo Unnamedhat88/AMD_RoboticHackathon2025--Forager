@@ -24,8 +24,14 @@ class CameraInterface:
         else:
             ret, frame = self.cap.read()
             if not ret:
-                raise RuntimeError("Failed to capture frame")
+                # Try to reconnect or just log error? For now raise.
+                # In robust system we might want to release and re-open.
+                raise RuntimeError("Failed to capture frame from Camera")
             return frame
+
+    def capture_frame(self):
+        """Alias for get_frame to match spec."""
+        return self.get_frame()
 
     def release(self):
         if not self.mock:

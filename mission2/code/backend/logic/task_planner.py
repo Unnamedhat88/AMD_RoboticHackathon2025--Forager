@@ -111,6 +111,49 @@ class TaskPlanner:
         self.running = True
         self.logger.info("TaskPlanner started.")
 
+    def scan_and_log(self):
+        """
+        Phase 1.A: Manual scan trigger.
+        Captures frame, detects item, logs to DB.
+        """
+        self.logger.info("Manual Scan Triggered")
+        
+        # 1. Capture
+        frame = self.camera.capture_frame()
+        
+        # 2. Detect
+        # Note: detect_item is the mock method we added
+        result = self.detector.detect_item(frame)
+        
+        # 3. Log
+        # New detector returns "name" and "confidence"
+        item_label = result.get('name', "Unknown")
+        confidence = result.get('confidence', 0.0)
+        
+        self.logger.info(f"Detected: {item_label} (Score: {confidence:.2f})")
+        
+        # Use the inventory manager to log (it wraps the DB logic)
+        if item_label != "Unknown Item":
+             db_item = self.inventory.log_item(item_label, category="grocery", status="manual_scan")
+        else:
+             db_item = None
+        
+        # 4. Return formatted result
+        if db_item:
+            return {
+                "name": db_item['name'],
+                "quantity": db_item['qty'],
+                "confidence": confidence
+            }
+        else:
+            # Fallback if DB log failed or unknown item
+            return {
+                "name": item_label,
+                "quantity": 0 if item_label == "Unknown Item" else 1, 
+                "confidence": confidence,
+                "error": "Not logged" if item_label == "Unknown Item" else "Failed to log to DB"
+            }
+
     def stop(self):
         self.running = False
         self.logger.info("TaskPlanner stopped.")
