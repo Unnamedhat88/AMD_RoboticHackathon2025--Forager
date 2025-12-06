@@ -33,16 +33,16 @@ export default function InventoryScreen() {
     const renderItem = ({ item }) => (
         <View style={styles.itemCard}>
             <View style={styles.iconContainer}>
-                <Package color="#D8DEE9" size={24} />
+                <Package color="#6B4E3D" size={24} />
             </View>
             <View style={styles.itemDetails}>
                 <Text style={styles.itemName}>{item.item_name}</Text>
                 <View style={styles.metaRow}>
-                    <Tag color="#81A1C1" size={14} />
+                    <Tag color="#8FBC8F" size={14} />
                     <Text style={styles.itemCategory}>{item.category}</Text>
                 </View>
                 <View style={styles.metaRow}>
-                    <Clock color="#81A1C1" size={14} />
+                    <Clock color="#8FBC8F" size={14} />
                     <Text style={styles.itemTime}>{item.timestamp}</Text>
                 </View>
             </View>
@@ -59,7 +59,7 @@ export default function InventoryScreen() {
                 keyExtractor={(item, index) => index.toString()}
                 contentContainerStyle={styles.list}
                 refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#D8DEE9" />
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6B8E23" />
                 }
                 ListEmptyComponent={
                     <Text style={styles.emptyText}>No items logged yet.</Text>
@@ -72,29 +72,38 @@ export default function InventoryScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1E1E2E',
+        backgroundColor: '#F9F8F2', // COLORS.background
         padding: 20,
     },
     headerTitle: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#D8DEE9',
+        color: '#6B4E3D', // COLORS.text
         marginBottom: 20,
+        fontFamily: 'System',
     },
     list: {
         gap: 15,
+        paddingBottom: 20,
     },
     itemCard: {
-        backgroundColor: '#2E3440',
-        borderRadius: 12,
+        backgroundColor: '#FFFFFF', // COLORS.cardBackground
+        borderRadius: 16, // Soft geometry
         padding: 15,
         flexDirection: 'row',
         alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+        elevation: 2,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
     },
     iconContainer: {
-        backgroundColor: '#3B4252',
-        padding: 10,
-        borderRadius: 10,
+        backgroundColor: '#F0F4C3', // Light yellowish green for icon background
+        padding: 12,
+        borderRadius: 12,
         marginRight: 15,
     },
     itemDetails: {
@@ -102,7 +111,7 @@ const styles = StyleSheet.create({
         gap: 4,
     },
     itemName: {
-        color: '#ECEFF4',
+        color: '#6B4E3D', // COLORS.text
         fontSize: 16,
         fontWeight: 'bold',
     },
@@ -112,21 +121,28 @@ const styles = StyleSheet.create({
         gap: 5,
     },
     itemCategory: {
-        color: '#D8DEE9',
+        color: '#6B4E3D', // COLORS.text
         fontSize: 12,
+        opacity: 0.7,
     },
     itemTime: {
-        color: '#81A1C1',
+        color: '#8FBC8F', // COLORS.primaryGradientStart
         fontSize: 12,
     },
     statusBadge: {
-        color: '#A3BE8C',
+        color: '#6B8E23', // COLORS.primary
         fontWeight: 'bold',
         fontSize: 12,
+        backgroundColor: '#F0F4C3',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
+        overflow: 'hidden',
     },
     emptyText: {
-        color: '#4C566A',
+        color: '#A0A0A0', // COLORS.inactive
         textAlign: 'center',
         marginTop: 50,
+        fontSize: 16,
     },
 });
