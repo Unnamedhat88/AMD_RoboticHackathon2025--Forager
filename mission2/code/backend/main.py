@@ -20,7 +20,7 @@ def main():
     logger.info("Starting Grocery Sorting Robot System (Phase 2.C)...")
     
     # 1. Initialize Threaded Camera
-    camera = CameraStream(src=0).start()
+    camera = CameraStream(src=4).start()
     time.sleep(1.0) # Warmup
     
     # 2. Initialize Tracker State
@@ -42,7 +42,7 @@ def main():
         # Start API Server
         logger.info("Starting API Server on port 8000...")
         # We pass tracker_state to the API instead of planner
-        app = create_app(tracker_state, inventory, arm)
+        app = create_app(tracker_state, inventory, arm, camera_stream=camera)
         uvicorn.run(app, host="0.0.0.0", port=8000)
 
     except KeyboardInterrupt:

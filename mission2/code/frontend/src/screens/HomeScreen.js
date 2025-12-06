@@ -8,12 +8,11 @@ import { MotiView, MotiImage } from 'moti';
 // const API_URL = 'http://localhost:8000'; // iOS Simulator
 const API_URL = process.env.EXPO_PUBLIC_API_URL; // Configured in .env
 
-import ScanningModal from '../components/ScanningModal';
 
 export default function HomeScreen({ navigation }) {
     const [status, setStatus] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [scanning, setScanning] = useState(false);
+    // Scanning state removed as we navigate to LiveView
 
     const fetchStatus = async () => {
         try {
@@ -26,31 +25,13 @@ export default function HomeScreen({ navigation }) {
         }
     };
 
-    const handleScan = async () => {
-        setScanning(true);
-        try {
-            // Add 10s timeout to prevent infinite hanging
-            const response = await axios.post(`${API_URL}/scan`, {}, { timeout: 10000 });
-            const result = response.data.result;
-
-            // Wait a bit to show the animation (optional, but nice for UX)
-            setTimeout(() => {
-                setScanning(false);
-                Alert.alert('Item Scanned', `Successfully logged: ${result.name}\nConfidence: ${(result.confidence * 100).toFixed(1)}%\nQty: ${result.quantity}`, [
-                    { text: 'View Inventory', onPress: () => navigation.navigate('Inventory') }
-                ]);
-            }, 1500);
-
-        } catch (error) {
-            setScanning(false);
-            Alert.alert('Error', 'Failed to scan item');
-            console.log(error);
-        }
+    const handleScan = () => {
+        navigation.navigate('LiveView');
     };
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScanningModal visible={scanning} />
+            {/* Modal removed */}
             <View style={styles.contentContainer}>
                 <MotiView
                     style={styles.logoContainer}
@@ -128,8 +109,8 @@ export default function HomeScreen({ navigation }) {
                         </TouchableOpacity>
                     </MotiView>
                 </View>
-            </View>
-        </SafeAreaView>
+            </View >
+        </SafeAreaView >
     );
 }
 

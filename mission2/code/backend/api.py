@@ -4,8 +4,9 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
-def create_app(tracker_state, inventory, arm=None):
+def create_app(tracker_state, inventory, arm=None, camera_stream=None):
     app = FastAPI(title="Grocery Robot API")
+    app.state.camera_stream = camera_stream
     
     # Enable CORS for Next.js frontend
     app.add_middleware(
@@ -50,7 +51,7 @@ def create_app(tracker_state, inventory, arm=None):
 
     @app.get("/inventory")
     def get_inventory():
-        return planner.inventory.get_all()
+        return inventory.get_all()
 
     @app.post("/inventory/add")
     def add_inventory_item(item: dict):
@@ -59,10 +60,57 @@ def create_app(tracker_state, inventory, arm=None):
 
     @app.delete("/inventory/{item_id}")
     def delete_inventory_item(item_id: int):
-        success = planner.inventory.delete_item(item_id)
+        success = inventory.delete_item(item_id) # integer ID to name or just ignore for now as our DB uses name
         if success:
-            return {"success": True, "message": f"Item {item_id} deleted"}
-        return JSONResponse(status_code=404, content={"success": False, "message": "Item not found"})
+            return {"success": True, "message": f"Item with ID {item_id} deleted."}
+        else:
+            return JSONResponse(status_code=404, content={"success": False, "message": f"Item with ID {item_id} not found."})
+
+    # --- Video Streaming ---
+    from fastapi.responses import StreamingResponse
+    import cv2
+    import time
+
+    def generate_frames():
+        while True:
+            # We need access to camera_stream here. 
+            # Ideally tracker_state or a global should provide it, or we pass it to create_app.
+            # For now, let's assume we can pass camera_stream to create_app.
+            if hasattr(app.state, 'camera_stream'):
+                frame = app.state.camera_stream.read()
+                if frame is None:
+                    continue
+                
+                # Encode frame to JPEG
+                ret, buffer = cv2.imencode('.jpg', frame)
+                if not ret:
+                    continue
+                frame_bytes = buffer.tobytes()
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+            else:
+                # Fallback or error
+                time.sleep(0.1)
+    
+    @app.get("/video_feed")
+    def video_feed():
+        return StreamingResponse(generate_frames(), media_type="multipart/x-mixed-replace; boundary=frame")
+
+    @app.get("/camera/latest")
+    def get_latest_frame():
+        """Return the current frame as a single JPEG image."""
+        if hasattr(app.state, 'camera_stream'):
+            frame = app.state.camera_stream.read()
+            if frame is not None:
+                ret, buffer = cv2.imencode('.jpg', frame)
+                if ret:
+                    from fastapi.responses import Response
+                    return Response(content=buffer.tobytes(), media_type="image/jpeg")
+        
+        # Return a placeholder or 404 if no frame
+        return JSONResponse(status_code=404, content={"error": "Camera not ready"})
+
+    return app
 
     @app.delete("/inventory/delete")
     def delete_inventory_item_by_name(item_name: str):
