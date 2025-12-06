@@ -1,23 +1,42 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, RefreshControl } from 'react-native';
+import { View, Text, FlatList, StyleSheet, RefreshControl, TouchableOpacity, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Package, Clock, Tag } from 'lucide-react-native';
+import { Package, Clock, Tag, ArrowLeft } from 'lucide-react-native';
+import { MotiView } from 'moti';
 
 const API_URL = 'http://10.0.2.2:8000'; // Android Emulator
 // const API_URL = 'http://localhost:8000'; // iOS
 
-export default function InventoryScreen() {
+export default function InventoryScreen({ navigation }) {
     const [items, setItems] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    const FAKE_DATA = [
+        { item_name: 'Red Apple', qty: 1, timestamp: '10:30 AM' },
+        { item_name: 'Banana', qty: 5, timestamp: '10:32 AM' },
+        { item_name: 'Carrot', qty: 2, timestamp: '10:35 AM' },
+        { item_name: 'Milk', qty: 12, timestamp: '10:40 AM' },
+        { item_name: 'Cereal', qty: 7, timestamp: '10:45 AM' },
+    ];
 
     const fetchInventory = async () => {
-        try {
-            const response = await axios.get(`${API_URL}/inventory`);
-            setItems(response.data);
-        } catch (error) {
-            console.log('Error fetching inventory:', error);
-        }
+        // Simulate API delay for animation
+        setTimeout(() => {
+            setItems(FAKE_DATA);
+            setLoading(false);
+        }, 1500); // Increased delay to show loading state
+
+        // Real API call (commented out for UI testing)
+        // try {
+        //     const response = await axios.get(`${API_URL}/inventory`);
+        //     setItems(response.data);
+        // } catch (error) {
+        //     console.log('Error fetching inventory:', error);
+        // } finally {
+        //     setLoading(false);
+        // }
     };
 
     const onRefresh = useCallback(async () => {
@@ -30,8 +49,17 @@ export default function InventoryScreen() {
         fetchInventory();
     }, []);
 
-    const renderItem = ({ item }) => (
-        <View style={styles.itemCard}>
+    const renderItem = ({ item, index }) => (
+        <MotiView
+            from={{ opacity: 0, translateY: 20 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{
+                type: 'timing',
+                duration: 500,
+                delay: index * 100,
+            }}
+            style={styles.itemCard}
+        >
             <View style={styles.iconContainer}>
                 <Package color="#6B4E3D" size={24} />
             </View>
@@ -39,32 +67,45 @@ export default function InventoryScreen() {
                 <Text style={styles.itemName}>{item.item_name}</Text>
                 <View style={styles.metaRow}>
                     <Tag color="#8FBC8F" size={14} />
-                    <Text style={styles.itemCategory}>{item.category}</Text>
+                    <Text style={styles.qty}>Qty: {item.qty}</Text>
                 </View>
                 <View style={styles.metaRow}>
                     <Clock color="#8FBC8F" size={14} />
                     <Text style={styles.itemTime}>{item.timestamp}</Text>
                 </View>
             </View>
-            <Text style={styles.statusBadge}>{item.status}</Text>
-        </View>
+
+        </MotiView>
     );
 
     return (
         <SafeAreaView style={styles.container}>
-            <Text style={styles.headerTitle}>Inventory</Text>
-            <FlatList
-                data={items}
-                renderItem={renderItem}
-                keyExtractor={(item, index) => index.toString()}
-                contentContainerStyle={styles.list}
-                refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6B8E23" />
-                }
-                ListEmptyComponent={
-                    <Text style={styles.emptyText}>No items logged yet.</Text>
-                }
-            />
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                    <ArrowLeft color="#6B4E3D" size={28} />
+                </TouchableOpacity>
+                <Text style={styles.headerTitle}>Inventory</Text>
+            </View>
+
+            {loading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#6B8E23" />
+                    <Text style={styles.loadingText}>Loading inventory...</Text>
+                </View>
+            ) : (
+                <FlatList
+                    data={items}
+                    renderItem={renderItem}
+                    keyExtractor={(item, index) => index.toString()}
+                    contentContainerStyle={styles.list}
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6B8E23" />
+                    }
+                    ListEmptyComponent={
+                        <Text style={styles.emptyText}>No items logged yet.</Text>
+                    }
+                />
+            )}
         </SafeAreaView>
     );
 }
@@ -75,11 +116,19 @@ const styles = StyleSheet.create({
         backgroundColor: '#F9F8F2', // COLORS.background
         padding: 20,
     },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+        gap: 15,
+    },
+    backButton: {
+        padding: 5,
+    },
     headerTitle: {
         fontSize: 28,
         fontWeight: 'bold',
         color: '#6B4E3D', // COLORS.text
-        marginBottom: 20,
         fontFamily: 'System',
     },
     list: {
@@ -120,7 +169,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 5,
     },
-    itemCategory: {
+    qty: {
         color: '#6B4E3D', // COLORS.text
         fontSize: 12,
         opacity: 0.7,
@@ -144,5 +193,16 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 50,
         fontSize: 16,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loadingText: {
+        marginTop: 10,
+        color: '#6B4E3D',
+        fontSize: 16,
+        fontFamily: 'System',
     },
 });
