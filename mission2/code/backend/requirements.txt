@@ -11,3 +11,4 @@ scipy
 ultralytics
 opencv-python-headless
 torchvision
+lapx
