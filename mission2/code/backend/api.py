@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
@@ -42,17 +43,22 @@ def create_app(planner, inventory):
 
     @app.get("/inventory")
     def get_inventory():
-        # Use the new DB logic directly
-        from logic import inventory_db
-        return inventory_db.get_all_items()
+        return planner.inventory.get_all()
 
     @app.post("/inventory/add")
     def add_inventory_item(item: dict):
         from logic import inventory_db
-        return inventory_db.add_item(item['item_name'], item['category'], item.get('qty', 1))
+        return inventory_db.add_item(item['name'], item['category'], item.get('qty', 1))
+
+    @app.delete("/inventory/{item_id}")
+    def delete_inventory_item(item_id: int):
+        success = planner.inventory.delete_item(item_id)
+        if success:
+            return {"success": True, "message": f"Item {item_id} deleted"}
+        return JSONResponse(status_code=404, content={"success": False, "message": "Item not found"})
 
     @app.delete("/inventory/delete")
-    def delete_inventory_item(item_name: str):
+    def delete_inventory_item_by_name(item_name: str):
         from logic import inventory_db
         success = inventory_db.delete_item(item_name)
         return {"success": success}

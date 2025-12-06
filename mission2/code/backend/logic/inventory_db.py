@@ -96,6 +96,17 @@ def delete_item(item_name):
         return True
     return False
 
+def delete_item_by_id(item_id):
+    """Delete an item by ID."""
+    db = _load_db()
+    initial_len = len(db)
+    db = [item for item in db if item.get('id') != item_id]
+    
+    if len(db) < initial_len:
+        _save_db(db)
+        return True
+    return False
+
 def clear_db():
     """Clear all items from the database."""
     _save_db([])

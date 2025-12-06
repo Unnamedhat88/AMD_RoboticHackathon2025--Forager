@@ -25,6 +25,17 @@ class InventoryManager:
             self.logger.error(f"Failed to fetch inventory: {e}")
             return []
 
+    def get_all(self):
+        """Alias for get_inventory to match API spec."""
+        return self.get_inventory()
+
+    def delete_item(self, item_id):
+        try:
+            return inventory_db.delete_item_by_id(item_id)
+        except Exception as e:
+            self.logger.error(f"Failed to delete item {item_id}: {e}")
+            return False
+
     def close(self):
         pass # No connection to close
 
