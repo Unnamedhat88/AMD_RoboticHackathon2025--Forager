@@ -88,7 +88,7 @@ outputs/
 
 # Data files (common patterns)
 *.csv
-*.json
+# *.json
 *.pkl
 *.pickle
 *.h5
