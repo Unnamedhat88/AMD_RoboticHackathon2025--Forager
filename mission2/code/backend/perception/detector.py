@@ -63,6 +63,27 @@ class GroceryDetector:
             
         return formatted_results
 
+    def detect_item(self, image):
+        """
+        Mock detection for Phase 1.A.
+        Returns a random item from the grocery list.
+        """
+        import random
+        GROCERY_CLASSES = ["apple", "banana", "bread", "milk", "egg"]
+        
+        # Simulate processing time
+        # import time
+        # time.sleep(0.5)
+        
+        item = random.choice(GROCERY_CLASSES)
+        confidence = random.uniform(0.8, 0.99)
+        
+        return {
+            "label": item,
+            "score": confidence,
+            "box": [100, 100, 200, 200] # Dummy box
+        }
+
 if __name__ == "__main__":
     # Test block
     det = GroceryDetector()

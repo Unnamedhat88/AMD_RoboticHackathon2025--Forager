@@ -27,6 +27,10 @@ class CameraInterface:
                 raise RuntimeError("Failed to capture frame")
             return frame
 
+    def capture_frame(self):
+        """Alias for get_frame to match spec."""
+        return self.get_frame()
+
     def release(self):
         if not self.mock:
             self.cap.release()

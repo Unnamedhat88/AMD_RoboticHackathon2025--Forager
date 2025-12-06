@@ -10,9 +10,8 @@ def main():
     logger.info("Starting Grocery Sorting Robot System...")
     
     # Initialize components
-    camera = CameraInterface(mock=False) # Try real camera, fallback to mock if fails? Handled in class.
-    # Actually, CameraInterface default was mock=True. Let's stick to mock for now unless we are sure.
-    # The plan said "Implement camera interface (Real/Mock)". Let's leave it as is but initialize detector.
+    # Initialize components
+    # Phase 1.A: Force mock camera
     camera = CameraInterface(mock=True)
     arm = ArmController(mock=True)
     

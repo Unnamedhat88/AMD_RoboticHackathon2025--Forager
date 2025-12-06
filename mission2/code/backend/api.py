@@ -34,6 +34,12 @@ def create_app(planner, inventory):
         planner.stop()
         return {"message": "Robot stopped"}
 
+    @app.post("/scan")
+    def scan_item():
+        """Trigger a manual scan and log."""
+        result = planner.scan_and_log()
+        return {"message": "Scan complete", "result": result}
+
     @app.get("/inventory")
     def get_inventory():
         # Use the new DB logic directly

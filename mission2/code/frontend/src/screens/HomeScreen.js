@@ -23,21 +23,18 @@ export default function HomeScreen({ navigation }) {
         }
     };
 
-    const sendCommand = async (command) => {
+    const handleScan = async () => {
         try {
-            await axios.post(`${API_URL}/${command}`);
-            Alert.alert('Success', `Robot ${command}ed`);
-            fetchStatus();
+            const response = await axios.post(`${API_URL}/scan`);
+            const result = response.data.result;
+            Alert.alert('Item Detected', `Found: ${result.label} (Confidence: ${(result.score * 100).toFixed(1)}%)`, [
+                { text: 'OK', onPress: () => navigation.navigate('Inventory') }
+            ]);
         } catch (error) {
-            Alert.alert('Error', `Failed to ${command} robot`);
+            Alert.alert('Error', 'Failed to scan item');
+            console.log(error);
         }
     };
-
-    useEffect(() => {
-        fetchStatus();
-        const interval = setInterval(fetchStatus, 2000);
-        return () => clearInterval(interval);
-    }, []);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -65,6 +62,36 @@ export default function HomeScreen({ navigation }) {
                             type: 'timing',
                             duration: 500,
                             delay: 500,
+                        }}
+                    >
+                        <TouchableOpacity
+                            activeOpacity={0.8}
+                            onPress={handleScan}
+                        >
+                            <MotiView
+                                style={[styles.button, styles.scanButton]}
+                                from={{ scale: 1 }}
+                                animate={({ pressed }) => ({
+                                    scale: pressed ? 0.95 : 1,
+                                })}
+                                transition={{
+                                    type: 'spring',
+                                    damping: 10,
+                                    stiffness: 200,
+                                }}
+                            >
+                                <Text style={styles.buttonText}>Scan Item</Text>
+                            </MotiView>
+                        </TouchableOpacity>
+                    </MotiView>
+
+                    <MotiView
+                        from={{ opacity: 0, translateY: 50 }}
+                        animate={{ opacity: 1, translateY: 0 }}
+                        transition={{
+                            type: 'timing',
+                            duration: 500,
+                            delay: 600,
                         }}
                     >
                         <TouchableOpacity
@@ -182,6 +209,9 @@ const styles = StyleSheet.create({
     },
     startButton: {
         backgroundColor: '#6B8E23', // COLORS.primary
+    },
+    scanButton: {
+        backgroundColor: '#8FBC8F', // Lighter green
     },
     stopButton: {
         backgroundColor: '#BF616A', // Keep red for stop, but maybe softer?
