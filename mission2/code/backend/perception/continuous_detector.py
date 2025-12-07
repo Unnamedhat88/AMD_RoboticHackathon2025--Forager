@@ -1,21 +1,21 @@
 import threading
 import time
 import logging
-from ultralytics import YOLO
+from ultralytics import YOLOWorld
 
 class PerceptionLoop:
-    def __init__(self, camera_stream, tracker_state, model_path="yolov8n.pt"):
+    def __init__(self, camera_stream, tracker_state, model_path="yolov8s-world.pt"):
         self.camera_stream = camera_stream
         self.tracker_state = tracker_state
         self.stopped = False
         self.logger = logging.getLogger("PerceptionLoop")
         
-        self.logger.info(f"Loading YOLO model {model_path}...")
+        self.logger.info(f"Loading YOLO-World model {model_path}...")
         try:
-            self.model = YOLO(model_path)
-            # Warmup
-            # self.model.track(source=self.camera_stream.read(), persist=True, tracker="bytetrack.yaml", verbose=False) 
-            self.logger.info("Model loaded.")
+            self.model = YOLOWorld(model_path)
+            # Set custom classes for the demo
+            self.model.set_classes(["Pocky box"])
+            self.logger.info("Model loaded. Classes set to: ['Pocky box']")
         except Exception as e:
             self.logger.error(f"Failed to load YOLO model: {e}")
             self.model = None
@@ -71,19 +71,9 @@ class PerceptionLoop:
 
     def _map_label(self, label):
         """
-        Map YOLOv8 COCO labels to Grocery labels.
+        Map labels if needed. For YOLO-World, it should match our set classes.
         """
-        mapping = {
-            "banana": "Banana",
-            "apple": "Red Apple",
-            "orange": "Orange",
-            "broccoli": "Broccoli",
-            "carrot": "Carrot",
-            "bottle": "Milk", 
-            "cup": "Cereal",
-            "box": "Cereal",
-        }
-        return mapping.get(label, label.title())
+        return label # Pass through exactly as detected
 
     def stop(self):
         self.stopped = True

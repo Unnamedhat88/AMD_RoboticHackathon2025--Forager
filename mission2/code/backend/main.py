@@ -20,10 +20,8 @@ def main():
     logger.info("Starting Grocery Sorting Robot System (Phase 2.C)...")
     
     # 1. Initialize Threaded Camera
-    # 1. Initialize Threaded Camera
     camera = CameraStream(src=8).start()
-    time.sleep(1.0) # Warmup
-    time.sleep(1.0) # Warmup
+    time.sleep(2.0) # Warmup
     
     # 2. Initialize Tracker State
     tracker_state = TrackerState()
@@ -34,7 +32,7 @@ def main():
     
     # 4. Initialize Other Components
     inventory = InventoryManager()
-    arm = ArmController(mock=True) # Phase 1 artifact
+    arm = ArmController(mock=False) # Enable real robot execution
     
     # Note: TaskPlanner is temporarily bypassed/deprecated in Phase 2.C 
     # as we move to a continuous decoupled architecture.

@@ -158,7 +158,7 @@ def create_app(tracker_state, inventory, arm=None, camera_stream=None):
         # Return a placeholder or 404 if no frame
         return JSONResponse(status_code=404, content={"error": "Camera not ready"})
 
-    return app
+
 
     @app.delete("/inventory/delete")
     def delete_inventory_item_by_name(item_name: str):

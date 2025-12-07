@@ -36,7 +36,7 @@ class ArmController:
             
             # Command from user request
             cmd = [
-                "lerobot-record",
+                "/home/amddemo/miniconda3/envs/lerobot/bin/lerobot-record",
                 "--robot.type=so101_follower",
                 "--robot.port=/dev/ttyACM1",
                 "--robot.id=my_awesome_follower_arm",
