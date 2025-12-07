@@ -3,7 +3,7 @@ import numpy as np
 import time
 
 class CameraInterface:
-    def __init__(self, device_id=0, mock=True):
+    def __init__(self, device_id="/dev/video2", mock=True):
         self.mock = mock
         self.device_id = device_id
         if not self.mock:

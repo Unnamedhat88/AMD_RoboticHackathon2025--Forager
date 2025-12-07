@@ -2,11 +2,23 @@ import cv2
 import threading
 import time
 import logging
+import numpy as np
 
 class CameraStream:
-    def __init__(self, src=0):
+    def __init__(self, device_id="/dev/video2", src=None):
+        self.logger = logging.getLogger("CameraStream")
         self.src = src
-        self.stream = cv2.VideoCapture(self.src)
+        self.device_id = device_id
+        
+        # Use src if explicit, otherwise device_id
+        if src is not None: 
+             target_cam = src
+        else:
+             target_cam = self.device_id
+             
+        self.stream = cv2.VideoCapture(target_cam)
+        
+        self.logger.info(f"Opening camera: {target_cam}")
         
         # Camera Settings
         self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -26,7 +38,6 @@ class CameraStream:
             self.logger.warning("Camera image extremely dark, checking auto-exposure...")
 
         self.stopped = False
-        self.logger = logging.getLogger("CameraStream")
         self.lock = threading.Lock()
 
         if not self.grabbed:
@@ -62,8 +73,8 @@ class CameraStream:
             # Gamma < 1.0 makes dark regions lighter
             if self.frame is not None:
                 # Optimized gamma correction using LUT
-                import numpy as np
-                gamma = 0.6 # < 1.0 to brighten
+                # gamma = 0.6 # < 1.0 to brighten
+                gamma = 0.6
                 invGamma = 1.0 / gamma
                 table = np.array([((i / 255.0) ** invGamma) * 255
                     for i in np.arange(0, 256)]).astype("uint8")
