@@ -71,5 +71,9 @@ class TrackerState:
         with self.lock:
             if track_id in self.tracked_objects:
                 self.tracked_objects[track_id]['logged'] = True
-                return self.tracked_objects[track_id]['label']
+                return {
+                    'label': self.tracked_objects[track_id]['label'],
+                    'box': self.tracked_objects[track_id]['box'],
+                    'score': self.tracked_objects[track_id]['score']
+                }
             return None

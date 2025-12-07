@@ -20,7 +20,7 @@ def main():
     logger.info("Starting Grocery Sorting Robot System (Phase 2.C)...")
     
     # 1. Initialize Threaded Camera
-    camera = CameraStream(src=4).start()
+    camera = CameraStream(src=6).start()
     time.sleep(1.0) # Warmup
     
     # 2. Initialize Tracker State

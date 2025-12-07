@@ -32,22 +32,9 @@ def _save_db(data):
         finally:
             fcntl.flock(f, fcntl.LOCK_UN)
 
-def add_item(item_name, category, qty=1):
+def add_item(item_name, category, qty=1, pose=None):
     """Add a new item or update quantity if it exists."""
-    # We need a read-modify-write cycle, so we should probably hold an exclusive lock 
-    # for the whole duration if we want to be strictly safe, but _load_db and _save_db 
-    # handle locks individually. For this simple app, the race condition between load and save 
-    # is acceptable, or we can implement a context manager for locking. 
-    # Given the requirements, simple function-level locking via _load/_save is likely sufficient 
-    # unless high concurrency is expected.
-    
-    # To be safer, let's do the load-modify-save in one open block if possible, 
-    # but that complicates the helper functions. 
-    # Let's stick to the helpers for now as per the prompt's simplicity, 
-    # but note that strictly speaking, RMW needs a lock across the whole operation.
-    
-    # However, to strictly follow "handle file locking", let's try to be robust.
-    # But for now, I will use the helpers which lock individually.
+    # ...
     
     db = _load_db()
     
@@ -56,6 +43,8 @@ def add_item(item_name, category, qty=1):
         if item.get('name', '').lower() == item_name.lower():
             item['qty'] += qty
             item['timestamp'] = datetime.now().strftime("%d/%m/%y %I:%M %p") # Update timestamp
+            if pose:
+                item['pose'] = pose # Update pose if provided
             _save_db(db)
             return item
 
@@ -65,7 +54,8 @@ def add_item(item_name, category, qty=1):
         "name": item_name,
         "category": category,
         "qty": qty,
-        "timestamp": datetime.now().strftime("%d/%m/%y %I:%M %p")
+        "timestamp": datetime.now().strftime("%d/%m/%y %I:%M %p"),
+        "pose": pose # Store pose
     }
     db.append(new_item)
     _save_db(db)

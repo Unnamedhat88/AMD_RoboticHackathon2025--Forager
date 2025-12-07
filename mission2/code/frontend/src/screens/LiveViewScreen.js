@@ -20,6 +20,10 @@ export default function LiveViewScreen({ navigation }) {
 
     const [imageUri, setImageUri] = useState(`${API_URL}/camera/latest?t=${Date.now()}`);
 
+    // Refs for stability and auto-logging
+    const failureCount = React.useRef(0);
+    const isLogging = React.useRef(false);
+
     useFocusEffect(
         useCallback(() => {
             const interval = setInterval(fetchObjects, 200);
@@ -31,25 +35,41 @@ export default function LiveViewScreen({ navigation }) {
         try {
             const response = await axios.get(`${API_URL}/objects`, { timeout: 1000 });
             setObjects(response.data);
+
+            // Jitter Fix: Only update connection status on success
+            failureCount.current = 0;
             if (!connected) setConnected(true);
+
+            // Auto-Logging Logic
+            if (!isLogging.current) {
+                const unloggedItem = response.data.find(obj => !obj.logged);
+                if (unloggedItem) {
+                    isLogging.current = true;
+                    await handleLogItem(unloggedItem.id, unloggedItem.name);
+                    isLogging.current = false;
+                }
+            }
         } catch (error) {
-            setConnected(false);
-            // console.log("Connection lost", error.message);
+            failureCount.current += 1;
+            // Only go offline after 3 consecutive failures
+            if (failureCount.current >= 3) {
+                setConnected(false);
+            }
         }
     };
 
     const handleLogItem = async (trackId, name) => {
         try {
-            Vibration.vibrate(50);
             const response = await axios.post(`${API_URL}/log/${trackId}`);
             if (response.data.success) {
-                Alert.alert("Success", `Logged ${name} to Inventory`);
-                // Optional: Force refresh or just let next poll handle it (though backend mark_logged handles state)
+                Vibration.vibrate(50);
+                // We don't need to alert anymore, the checkmark UI update is enough feedback
+                // and the backend updates the 'logged' state in the next poll cycle.
             } else {
-                Alert.alert("Info", response.data.error || "Could not log item");
+                // Silent fail or console warn
             }
         } catch (error) {
-            Alert.alert("Error", "Failed to log item");
+            // Ignore temporary failures
         }
     };
 
@@ -76,15 +96,17 @@ export default function LiveViewScreen({ navigation }) {
 
         return (
             <View key={obj.id} style={[styles.bbox, { left, top, width: boxW, height: boxH, borderColor: obj.logged ? '#A0A0A0' : '#6B8E23' }]}>
-                <View style={styles.labelTag}>
-                    <Text style={styles.labelText}>{obj.name} {Math.round(obj.confidence * 100)}%</Text>
-                </View>
-                {!obj.logged && (
-                    <TouchableOpacity style={styles.logButton} onPress={() => handleLogItem(obj.id, obj.name)}>
-                        <Plus size={16} color="#FFF" />
-                        <Text style={styles.logButtonText}>Log</Text>
-                    </TouchableOpacity>
+                {obj.logged ? (
+                    <View style={[styles.labelTag, { backgroundColor: '#A0A0A0' }]}>
+                        <Text style={styles.labelText}>✔ {obj.name} (Logged)</Text>
+                    </View>
+                ) : (
+                    <View style={styles.labelTag}>
+                        <Text style={styles.labelText}>{obj.name} {Math.round(obj.confidence * 100)}%</Text>
+                    </View>
                 )}
+
+
             </View>
         );
     };

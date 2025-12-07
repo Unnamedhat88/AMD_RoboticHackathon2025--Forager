@@ -1,16 +1,47 @@
 [
     {
+        "id": 1,
+        "name": "Person",
+        "category": "grocery",
+        "qty": 5,
+        "timestamp": "07/12/25 09:54 AM",
+        "pose": {
+            "x": -0.15800000727176666,
+            "y": 0.4269999861717224,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
+    },
+    {
         "id": 2,
-        "name": "bread",
+        "name": "Milk",
         "category": "grocery",
         "qty": 2,
-        "timestamp": "06/12/25 09:22 PM"
+        "timestamp": "07/12/25 09:55 AM",
+        "pose": {
+            "x": 0.1889999955892563,
+            "y": 0.4449999928474426,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
     },
     {
         "id": 3,
-        "name": "milk",
+        "name": "Kite",
         "category": "grocery",
-        "qty": 2,
-        "timestamp": "07/12/25 01:56 AM"
+        "qty": 1,
+        "timestamp": "07/12/25 09:55 AM",
+        "pose": {
+            "x": 0.0,
+            "y": 0.4230000078678131,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
     }
 ]

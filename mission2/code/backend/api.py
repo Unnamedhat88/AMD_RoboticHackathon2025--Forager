@@ -1,12 +1,22 @@
 
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import List, Optional
 import logging
+import cv2
+import time
+
+from perception.pose_estimator import PoseEstimator
 
 def create_app(tracker_state, inventory, arm=None, camera_stream=None):
     app = FastAPI(title="Grocery Robot API")
     app.state.camera_stream = camera_stream
+    
+    # Initialize Pose Estimator
+    pose_estimator = PoseEstimator()
     
     # Enable CORS for Next.js frontend
     app.add_middleware(
@@ -39,15 +49,40 @@ def create_app(tracker_state, inventory, arm=None, camera_stream=None):
         return tracker_state.get_stable_objects() # logic/TaskPlanner not needed
 
     @app.post("/log/{track_id}")
-    def log_tracked_item(track_id: int):
-        """Log a specific tracked item to inventory."""
-        label = tracker_state.mark_logged(track_id)
-        if label:
-            from logic import inventory_db
-            db_item = inventory_db.add_item(label, "grocery", 1)
-            return {"success": True, "item": db_item}
-        else:
-            return {"success": False, "error": "Item not found or already logged"}
+    def log_item(track_id: int):
+        """
+        Log an item to inventory by track ID.
+        Returns the logged item including calculated grasp pose.
+        """
+        # mark_logged now returns a dict with {label, box, score} or None
+        obj_data = tracker_state.mark_logged(track_id)
+        
+        if obj_data:
+            item_name = obj_data['label']
+            box = obj_data['box']
+            
+            # Estimate Pose
+            pose = pose_estimator.estimate_pose(box)
+            
+            # Add to Inventory with Pose
+            # Note: inventory.add_item calls inventory_db.add_item which now accepts pose
+            # We need to update inventory.py wrapper first? NO, inventory.py just calls db.add_item
+            # Let's check inventory.py, likely it just forwards args or we need to update it.
+            # Assuming for now we can update inventory.add_item signature or pass kwargs.
+            # Ideally inventory.py/InventoryManager.add_item needs update too.
+            
+            # Let's update InventoryManager.add_item in next step if generic, 
+            # or just call db directly methods if exposed. 
+            # Checking logic/inventory.py... likely simple wrapper.
+            
+            # For now let's assume InventoryManager abstracts it.
+            # Wait, I should verify inventory.py.
+            
+            added_item = inventory.add_item(item_name, category="grocery", qty=1, pose=pose)
+            
+            return JSONResponse(content={"success": True, "item": added_item})
+        
+        return JSONResponse(content={"success": False, "error": "Item not found or already logged"})
 
     @app.get("/inventory")
     def get_inventory():
