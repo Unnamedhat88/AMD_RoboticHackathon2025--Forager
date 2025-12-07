@@ -23,6 +23,28 @@ export default function LiveViewScreen({ navigation }) {
     // Refs for stability and auto-logging
     const failureCount = React.useRef(0);
     const isLogging = React.useRef(false);
+    const [isScanning, setIsScanning] = useState(false);
+
+    const handleScanTrigger = async () => {
+        setIsScanning(true);
+        Vibration.vibrate(100);
+        try {
+            const res = await axios.post(`${API_URL}/robot/scan`);
+            if (res.data.success) {
+                Alert.alert("Robot Started", "Arm is picking up the item...");
+            } else {
+                Alert.alert("Busy", res.data.message || "Robot is busy");
+                setIsScanning(false);
+            }
+        } catch (e) {
+            Alert.alert("Error", "Could not trigger robot.");
+            setIsScanning(false);
+        }
+
+        // Reset scanning state after a while or poll for status? 
+        // For now, reset after 15s (approx cycle time)
+        setTimeout(() => setIsScanning(false), 15000);
+    };
 
     useFocusEffect(
         useCallback(() => {
@@ -147,7 +169,14 @@ export default function LiveViewScreen({ navigation }) {
             </View>
 
             <View style={styles.footer}>
-                <Text style={styles.hintText}>Point camera at objects. Tap + to log.</Text>
+                <TouchableOpacity
+                    style={[styles.scanButton, isScanning && styles.disabledButton]}
+                    onPress={handleScanTrigger}
+                    disabled={isScanning}
+                >
+                    <Text style={styles.scanButtonText}>{isScanning ? 'Robot Moving...' : 'Start Scan Cycle'}</Text>
+                </TouchableOpacity>
+                <Text style={styles.hintText}>Place item in pink area & press Start</Text>
             </View>
         </SafeAreaView>
     );
@@ -251,5 +280,21 @@ const styles = StyleSheet.create({
     hintText: {
         color: '#6B4E3D',
         opacity: 0.6,
+        marginTop: 10,
+    },
+    scanButton: {
+        backgroundColor: '#6B4E3D',
+        paddingHorizontal: 40,
+        paddingVertical: 15,
+        borderRadius: 30,
+        elevation: 5,
+    },
+    disabledButton: {
+        backgroundColor: '#A0A0A0',
+    },
+    scanButtonText: {
+        color: '#FFF',
+        fontSize: 18,
+        fontWeight: 'bold',
     }
 });

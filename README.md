@@ -11,7 +11,7 @@
 ## Summary
 **Vision-Guided Mobile Manipulation for Home Grocery Organization and Item Sorting**
 
-This is a project developed for the AMD Robotics Hackathon 2025 held in Tokyo from Dec 5, 2025 ~ Dec 7, 2025. We are a team of second years from Ritsumeikan University, Osaka, Japan and we aim to build an **autonomous home-assistant robot** for grocery organization and item sorting. The system is designed to be **end-to-end embodied perception and manipulation**, integrating Vision-Language Perception, Object Grasping, Placement Task Planning, and Item Logging. It is capable of:
+This is a project developed for the AMD Robotics Hackathon 2025 held in Tokyo from Dec 5, 2025 ~ Dec 7, 2025. We are a team of second year students from Ritsumeikan University, Osaka, Japan and we aim to build an **autonomous home-assistant robot** for grocery organization and item sorting. The system is designed to be **end-to-end embodied perception and manipulation**, integrating Vision-Language Perception, Object Grasping, Placement Task Planning, and Item Logging. It is capable of:
 * Detecting multiple grocery items in a **cluttered table or bag**
 * **Picking items** using a robotic arm and **scanning them visually**
 * **Classifying** items into semantic categories (e.g., produce vs. packaged goods)
@@ -23,8 +23,12 @@ This is a project developed for the AMD Robotics Hackathon 2025 held in Tokyo fr
 * We also wanted to incorporate QR codes for situations where this is deployed in a convenience store or a 100 yen shop in Japan. The QR code will be able to store the item information and the price of the item along with updates on the inventory. The robot would pick up the item, try to scan the QR code initially and if it doesn't see it, it will try to rotate the item across all the surface areas, and if it's not able to see the barcode at all, it will just place it back where it picked it up.
 
 ## Achievements
-* 
-* 
+* Real-time grocery object detection via YOLOv8 + ByteTrack (20–30 FPS)
+* Automatic item logging once an object stabilizes in view
+* Full mobile interface with live bounding box overlay and cloudless backend
+* Seamless perception → manipulation pipeline trigger from mobile app
+* Robotic pickup routine tested on the SO-101 with pocky box physical object
+
 
 ## Challenges
 * The teleoperation and imitation learning using LeRobot's ecosystem costed us a lot of time as we were in unfamiliar territory and kept running into a lot of errors which took a lot of time to debug and even the training or improvement aspect of the model had a lot of issues that we were not familiar with.

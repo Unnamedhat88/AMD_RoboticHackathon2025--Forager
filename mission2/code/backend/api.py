@@ -1,5 +1,3 @@
-
-
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,10 +8,17 @@ import cv2
 import time
 
 from perception.pose_estimator import PoseEstimator
+from manipulation.state_machine import ScanStateMachine
 
 def create_app(tracker_state, inventory, arm=None, camera_stream=None):
     app = FastAPI(title="Grocery Robot API")
     app.state.camera_stream = camera_stream
+    app.state.inventory = inventory
+    app.state.tracker_state = tracker_state
+    
+    # Initialize Logic Components
+    state_machine = ScanStateMachine(arm) if arm else None
+    app.state.state_machine = state_machine
     
     # Initialize Pose Estimator
     pose_estimator = PoseEstimator()
@@ -100,6 +105,14 @@ def create_app(tracker_state, inventory, arm=None, camera_stream=None):
             return {"success": True, "message": f"Item with ID {item_id} deleted."}
         else:
             return JSONResponse(status_code=404, content={"success": False, "message": f"Item with ID {item_id} not found."})
+
+    @app.post("/robot/scan")
+    def trigger_scan():
+        if not state_machine:
+            return JSONResponse(content={"success": False, "error": "Arm not initialized"}, status_code=503)
+            
+        success, msg = state_machine.run_scan_routine("pickup the cube")
+        return JSONResponse(content={"success": success, "message": msg})
 
     # --- Video Streaming ---
     from fastapi.responses import StreamingResponse
