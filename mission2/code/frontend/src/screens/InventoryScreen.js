@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, FlatList, StyleSheet, RefreshControl, TouchableOpacity, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,7 +8,7 @@ import { MotiView } from 'moti';
 
 // const API_URL = 'http://10.0.2.2:8000'; // Android Emulator
 // const API_URL = 'http://localhost:8000'; // iOS
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.11.33:8000'; // Fallback to physical device IP
+const API_URL = process.env.EXPO_PUBLIC_API_URL
 
 export default function InventoryScreen({ navigation }) {
     const [items, setItems] = useState([]);
@@ -22,32 +23,27 @@ export default function InventoryScreen({ navigation }) {
         { name: 'Cereal', qty: 7, timestamp: '06/12/25 10:45 AM' },
     ];
 
-    const fetchInventory = async () => {
-        // Simulate API delay for animation
-        setTimeout(() => {
-            setItems(FAKE_DATA);
-            setLoading(false);
-        }, 1500); // Increased delay to show loading state
+    useFocusEffect(
+        useCallback(() => {
+            fetchInventory();
+        }, [])
+    );
 
-        // Real API call (commented out for UI testing)
-        // try {
-        //     const response = await axios.get(`${API_URL}/inventory`);
-        //     setItems(response.data);
-        // } catch (error) {
-        //     console.log('Error fetching inventory:', error);
-        // } finally {
-        //     setLoading(false);
-        // }
+    const fetchInventory = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/inventory`);
+            setItems(response.data);
+        } catch (error) {
+            console.log('Error fetching inventory:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
         await fetchInventory();
         setRefreshing(false);
-    }, []);
-
-    useEffect(() => {
-        fetchInventory();
     }, []);
 
     const renderItem = ({ item, index }) => (

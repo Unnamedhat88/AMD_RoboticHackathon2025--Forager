@@ -56,10 +56,11 @@ class TrackerState:
             for tid, obj in self.tracked_objects.items():
                 if obj['count'] >= min_seen_count:
                     stable.append({
-                        'id': tid,
-                        'name': obj['label'],
-                        'confidence': obj['score'],
-                        'logged': obj.get('logged', False)
+                        'id': int(tid),
+                        'name': str(obj['label']),
+                        'confidence': float(obj['score']),
+                        'box': [float(c) for c in obj['box']], # Cast box coords too
+                        'logged': bool(obj.get('logged', False))
                     })
             return stable
 
@@ -70,5 +71,9 @@ class TrackerState:
         with self.lock:
             if track_id in self.tracked_objects:
                 self.tracked_objects[track_id]['logged'] = True
-                return self.tracked_objects[track_id]['label']
+                return {
+                    'label': self.tracked_objects[track_id]['label'],
+                    'box': self.tracked_objects[track_id]['box'],
+                    'score': self.tracked_objects[track_id]['score']
+                }
             return None

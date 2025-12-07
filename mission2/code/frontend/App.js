@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Home, List } from 'lucide-react-native';
 import HomeScreen from './src/screens/HomeScreen';
 import InventoryScreen from './src/screens/InventoryScreen';
+import LiveViewScreen from './src/screens/LiveViewScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -14,7 +15,7 @@ export default function App() {
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            display: 'none', // Hide the nav bar
+            display: 'none', // Hide the nav bar as requested, navigation via Home Screen buttons
             backgroundColor: '#F9F8F2', // COLORS.background
             borderTopColor: '#E0E0E0', // COLORS.border
             elevation: 0, // Remove shadow on Android for cleaner look
@@ -22,12 +23,8 @@ export default function App() {
             height: 60,
             paddingBottom: 10,
           },
-          tabBarActiveTintColor: '#6B8E23', // COLORS.primary
-          tabBarInactiveTintColor: '#A0A0A0', // COLORS.inactive
-          tabBarLabelStyle: {
-            fontFamily: 'System', // FONTS.body
-            fontSize: 12,
-          },
+          tabBarActiveTintColor: '#6B8E23',
+          tabBarInactiveTintColor: '#A0A0A0',
         }}
       >
         <Tab.Screen
@@ -42,6 +39,15 @@ export default function App() {
           component={InventoryScreen}
           options={{
             tabBarIcon: ({ color, size }) => <List color={color} size={size} />,
+          }}
+        />
+        <Tab.Screen
+          name="LiveView" // Internal name for navigation
+          component={LiveViewScreen}
+          options={{
+            headerShown: false, // Hide native header, using custom one in screen
+            tabBarButton: () => null, // Hide from tab bar
+            tabBarStyle: { display: 'none' } // Hide tab bar when on this screen
           }}
         />
       </Tab.Navigator>

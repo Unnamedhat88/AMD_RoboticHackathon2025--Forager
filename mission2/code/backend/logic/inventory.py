@@ -6,12 +6,12 @@ class InventoryManager:
         self.logger = logging.getLogger("Inventory")
         self.logger.info("Initialized InventoryManager with JSON DB")
 
-    def log_item(self, item_name, category="grocery", status="stored"):
+    def log_item(self, item_name, category="grocery", status="stored", qty=1, pose=None):
         # Map log_item to add_item
         # Note: 'status' is not currently used in the simple JSON schema, 
         # but we could add it if needed. For now, we just track name, category, qty.
         try:
-            result = inventory_db.add_item(item_name, category)
+            result = inventory_db.add_item(item_name, category, qty, pose)
             self.logger.info(f"Logged item: {item_name} ({category})")
             return result
         except Exception as e:
@@ -38,4 +38,7 @@ class InventoryManager:
 
     def close(self):
         pass # No connection to close
+
+    def add_item(self, item_name, category="grocery", qty=1, pose=None):
+        return self.log_item(item_name, category=category, qty=qty, pose=pose)
 

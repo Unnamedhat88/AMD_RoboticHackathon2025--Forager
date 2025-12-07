@@ -1,16 +1,257 @@
 [
     {
-        "id": 2,
-        "name": "bread",
+        "id": 1,
+        "name": "Person",
         "category": "grocery",
-        "qty": 2,
-        "timestamp": "06/12/25 09:22 PM"
+        "qty": 149,
+        "timestamp": "07/12/25 12:32 PM",
+        "pose": {
+            "x": 0.12700000405311584,
+            "y": 0.328000009059906,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
+    },
+    {
+        "id": 2,
+        "name": "Milk",
+        "category": "grocery",
+        "qty": 8,
+        "timestamp": "07/12/25 12:28 PM",
+        "pose": {
+            "x": 0.0,
+            "y": 0.42500001192092896,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
     },
     {
         "id": 3,
-        "name": "milk",
+        "name": "Kite",
         "category": "grocery",
         "qty": 1,
-        "timestamp": "06/12/25 09:24 PM"
+        "timestamp": "07/12/25 09:55 AM",
+        "pose": {
+            "x": 0.0,
+            "y": 0.4230000078678131,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
+    },
+    {
+        "id": 4,
+        "name": "Book",
+        "category": "grocery",
+        "qty": 5,
+        "timestamp": "07/12/25 12:08 PM",
+        "pose": {
+            "x": 0.05000000074505806,
+            "y": 0.4580000042915344,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
+    },
+    {
+        "id": 5,
+        "name": "Refrigerator",
+        "category": "grocery",
+        "qty": 5,
+        "timestamp": "07/12/25 12:28 PM",
+        "pose": {
+            "x": -0.10700000077486038,
+            "y": 0.4009999930858612,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
+    },
+    {
+        "id": 6,
+        "name": "Suitcase",
+        "category": "grocery",
+        "qty": 2,
+        "timestamp": "07/12/25 12:27 PM",
+        "pose": {
+            "x": 0.08399999886751175,
+            "y": 0.46399998664855957,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
+    },
+    {
+        "id": 7,
+        "name": "Laptop",
+        "category": "grocery",
+        "qty": 3,
+        "timestamp": "07/12/25 12:30 PM",
+        "pose": {
+            "x": 0.017000000923871994,
+            "y": 0.37299999594688416,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
+    },
+    {
+        "id": 8,
+        "name": "Mouse",
+        "category": "grocery",
+        "qty": 3,
+        "timestamp": "07/12/25 12:17 PM",
+        "pose": {
+            "x": -0.08900000154972076,
+            "y": 0.32100000977516174,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
+    },
+    {
+        "id": 9,
+        "name": "Cell Phone",
+        "category": "grocery",
+        "qty": 3,
+        "timestamp": "07/12/25 12:17 PM",
+        "pose": {
+            "x": 0.1509999930858612,
+            "y": 0.41200000047683716,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
+    },
+    {
+        "id": 10,
+        "name": "Toilet",
+        "category": "grocery",
+        "qty": 2,
+        "timestamp": "07/12/25 12:28 PM",
+        "pose": {
+            "x": 0.08399999886751175,
+            "y": 0.46399998664855957,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
+    },
+    {
+        "id": 11,
+        "name": "Parking Meter",
+        "category": "grocery",
+        "qty": 1,
+        "timestamp": "07/12/25 12:18 PM",
+        "pose": {
+            "x": 0.14800000190734863,
+            "y": 0.4129999876022339,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
+    },
+    {
+        "id": 12,
+        "name": "Chair",
+        "category": "grocery",
+        "qty": 3,
+        "timestamp": "07/12/25 12:29 PM",
+        "pose": {
+            "x": 0.15000000596046448,
+            "y": 0.4309999942779541,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
+    },
+    {
+        "id": 13,
+        "name": "Dining Table",
+        "category": "grocery",
+        "qty": 1,
+        "timestamp": "07/12/25 12:26 PM",
+        "pose": {
+            "x": -0.04699999839067459,
+            "y": 0.4519999921321869,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
+    },
+    {
+        "id": 14,
+        "name": "Donut",
+        "category": "grocery",
+        "qty": 1,
+        "timestamp": "07/12/25 12:28 PM",
+        "pose": {
+            "x": -0.1469999998807907,
+            "y": 0.4779999852180481,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
+    },
+    {
+        "id": 15,
+        "name": "Bowl",
+        "category": "grocery",
+        "qty": 1,
+        "timestamp": "07/12/25 12:28 PM",
+        "pose": {
+            "x": 0.04899999871850014,
+            "y": 0.367000013589859,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
+    },
+    {
+        "id": 16,
+        "name": "Microwave",
+        "category": "grocery",
+        "qty": 2,
+        "timestamp": "07/12/25 12:28 PM",
+        "pose": {
+            "x": -0.09200000017881393,
+            "y": 0.40400001406669617,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
+    },
+    {
+        "id": 17,
+        "name": "Cereal",
+        "category": "grocery",
+        "qty": 3,
+        "timestamp": "07/12/25 12:30 PM",
+        "pose": {
+            "x": -0.08299999684095383,
+            "y": 0.39500001072883606,
+            "z": 0.35,
+            "roll": 0.0,
+            "pitch": -1.57,
+            "yaw": 0.0
+        }
     }
 ]
