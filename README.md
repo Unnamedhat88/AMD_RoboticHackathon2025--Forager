@@ -31,7 +31,7 @@ This is a project developed for the AMD Robotics Hackathon 2025 held in Tokyo fr
 * We were also limited to just one working computer since we also only have access to 2 working SO-101 robotic arms, as we did not aspect that we would need extra equipment, we ended up having to take turns on the laptop, be it for the motion control aspect of the project or the software development aspect of the project.
 
 ## Flowchart
-![Flowchart](./mission2/code/frontend/assets/AMD_hackathon_flowchart.png)
+![Flowchart](./mission2/code/frontend/assets/AMD_hackathon_flowchart.jpg)
 The workflow begins when the user opens the "Forager" app and clicks "scan items," which triggers the backend to request camera frames and initiate the robotic pickup process. The system then detects objects in the workspace; if an item is found, the robot picks it up and physically rotates it to ensure the camera can find a valid QR code or identifiable feature. Once scanned and validated, the system logs the item into the database before the robot places it back down, completing the cycle from physical manipulation to digital inventory tracking.
 
 ## Future Applications
