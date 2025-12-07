@@ -8,7 +8,11 @@
 - Great Gilbert Soco
 - Yamane Leon
 
-## Summary
+- [Link to Demo Video](./demo.mp4)
+
+## Demo Video
+[![Demo Video](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+*(Replace with your video link or upload a file)*
 **Vision-Guided Mobile Manipulation for Home Grocery Organization and Item Sorting**
 
 This is a project developed for the AMD Robotics Hackathon 2025 held in Tokyo from Dec 5, 2025 ~ Dec 7, 2025. We are a team of second year students from Ritsumeikan University, Osaka, Japan and we aim to build an **autonomous home-assistant robot** for grocery organization and item sorting. The system is designed to be **end-to-end embodied perception and manipulation**, integrating Vision-Language Perception, Object Grasping, Placement Task Planning, and Item Logging. It is capable of:

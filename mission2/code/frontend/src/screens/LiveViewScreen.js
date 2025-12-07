@@ -148,12 +148,20 @@ export default function LiveViewScreen({ navigation }) {
             <View style={styles.cameraContainer}>
                 {/* Live Video Feed (WebView) */}
                 <WebView
-                    source={{ uri: `${API_URL}/video_feed` }}
+                    source={{
+                        html: `
+                        <html>
+                          <body style="margin:0; padding:0; background:black; display:flex; justify-content:center; align-items:center;">
+                            <img src="${API_URL}/video_feed" style="width:100%; height:100%; object-fit: fill;" />
+                          </body>
+                        </html>
+                        `
+                    }}
                     style={styles.cameraPreview}
                     scrollEnabled={false}
                     javaScriptEnabled={true}
                     domStorageEnabled={true}
-                    scalesPageToFit={true}
+                    scalesPageToFit={false} // Disable to let CSS handle scaling
                 />
 
                 {/* Overlay Layer */}
@@ -218,7 +226,7 @@ const styles = StyleSheet.create({
     cameraPreview: {
         width: '100%',
         height: '100%',
-        opacity: 0.5, // Dim it a bit to make boxes pop
+        // opacity: 0.5, // Commented out to fix dark feed
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,
